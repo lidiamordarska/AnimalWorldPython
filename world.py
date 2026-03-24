@@ -89,19 +89,20 @@ class World:
 
     def initial_population(self):
         # self.human = Human(Point2D(5, 5), self)
-        Antelope(Point2D(10, 10), self)
-        Grass(Point2D(2, 0), self)
+        wolf = Wolf(Point2D(4, 7))
+        self.add_organism(wolf)
+        antelope = Antelope(Point2D(10, 10))
+        self.add_organism(antelope)
+        grass  = Grass(Point2D(2, 0))
+        self.add_organism(grass)
         # Sheep(Point2D(19, 19), self)
         # Sheep(Point2D(16, 17), self)
-        Wolf(Point2D(4, 7), self)
         # Wolf(Point2D(6, 7), self)
         # Wolf(Point2D(5, 8), self)
-        Fox(Point2D(5, 7), self)
-        Fox(Point2D(6, 7), self)
-        Fox(Point2D(5, 8), self)
-        Fox(Point2D(6, 8), self)
-        Fox(Point2D(5, 9), self)
-        Dandelion(Point2D(3, 9), self)
+        fox = Fox(Point2D(5, 7))
+        self.add_organism(fox)
+        dandelion = Dandelion(Point2D(3, 9))
+        self.add_organism(dandelion)
         # Guarana(Point2D(6, 5), self)
         # Hogweed(Point2D(18, 17), self)
         # Berries(Point2D(10, 12), self)
@@ -116,7 +117,7 @@ class World:
         size = len(self.organisms)
         for i in range(size):
             if self.organisms[i].get_strength() >= 0:
-                self.organisms[i].action()
+                self.organisms[i].action(self)
 
     def _sort_organisms(self):
         self.organisms.sort(key=lambda organism: organism.get_initiative(), reverse=True)

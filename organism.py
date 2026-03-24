@@ -2,40 +2,35 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from point2d import Point2D
 from typing import Optional
-from world import World  # Zmiana z 'import world' na konkretny import klasy
 
 @dataclass
 class Organism(ABC):
     icon: str
-    strength: int        # Wcześniej: sila
+    strength: int
     initiative: int
-    position: Point2D    # Wcześniej: pozycja
+    position: Point2D
     immortal: bool
-    world: World         # Wcześniej: swiat
     age: int = 0
     previous_position: Optional[Point2D] = None
 
-    def __post_init__(self):
-        self.world.add_organism(self)  # Wcześniej: dodaj_organizm
 
     def get_position(self):
         return self.position
 
-    def set_position(self, position: Point2D, must_be_empty: bool, reproduction: bool) -> bool:
-        # Używamy get_x() oraz get_y() dla spójności z resztą kodu
-        if (position.get_x() < 0 or position.get_x() >= self.world.get_width() or
-                position.get_y() < 0 or position.get_y() >= self.world.get_height()):
+    def set_position(self, position: Point2D, must_be_empty: bool, reproduction: bool, world: 'World') -> bool:
+        if (position.get_x() < 0 or position.get_x() >= world.get_width() or
+                position.get_y() < 0 or position.get_y() >= world.get_height()):
             return False
 
-        if must_be_empty and self.world.get_organism(position) is not None:
+        if must_be_empty and world.get_organism(position) is not None:
             return False
 
         self.previous_position = self.position
-        other = self.world.get_organism(position)
+        other = world.get_organism(position)
         self.position = position
 
         if not reproduction:
-            self.world.add_log(self, f" Moves from [{self.previous_position.get_x()};{self.previous_position.get_y()}] to [{self.position.get_x()};{self.position.get_y()}]")
+            world.add_log(self, f" Moves from [{self.previous_position.get_x()};{self.previous_position.get_y()}] to [{self.position.get_x()};{self.position.get_y()}]")
             print(f" Moves [{self.icon}] from [{self.previous_position.get_x()};{self.previous_position.get_y()}] to [{self.position.get_x()};{self.position.get_y()}]")
 
         if other:
@@ -44,15 +39,15 @@ class Organism(ABC):
         return True
 
     @abstractmethod
-    def collision(self, other: 'Organism'):
+    def collision(self, other: 'Organism', world: 'World'):
         pass
 
     @abstractmethod
-    def action(self): # Wcześniej: akcja
+    def action(self, world: 'World'):
         pass
 
     @abstractmethod
-    def clone(self, location: Point2D): # Dodane: abstractmethod, ponieważ każda klasa dziedzicząca tego używa!
+    def clone(self, location: Point2D):
         pass
 
     def escape(self) -> bool:
@@ -60,8 +55,6 @@ class Organism(ABC):
 
     @staticmethod
     def spawn(organism_instance, location: Point2D):
-        # W oryginale argument nazywał się 'self', ale w metodach statycznych
-        # nie używamy 'self', więc zmieniłem to na 'organism_instance'.
         return organism_instance.clone(location)
 
     def __str__(self):
@@ -70,7 +63,7 @@ class Organism(ABC):
     def get_initiative(self):
         return self.initiative
 
-    def get_strength(self): # Wcześniej: get_sila
+    def get_strength(self):
         return self.strength
 
     def get_age(self):
@@ -79,18 +72,18 @@ class Organism(ABC):
     def get_icon(self):
         return self.icon
 
-    def increase_age(self, value: int): # Wcześniej: age_up
+    def increase_age(self, value: int):
         self.age += value
 
-    def kill(self): # Wcześniej: zabij
+    def kill(self):
         self.position = Point2D(-1, -1)
         self.strength = -1
         self.initiative = -1
 
-    def increase_strength(self, value: int): # Wcześniej: strengthen / wzmocnij
+    def increase_strength(self, value: int):
         self.strength += value
 
-    def undo_move(self): # Wcześniej: cofnij_ruch
+    def undo_move(self):
         self.set_position(self.previous_position, False, False)
 
     @staticmethod
@@ -105,6 +98,6 @@ class Organism(ABC):
     def is_immortal(self) -> bool:
         return self.immortal
 
-    def reproduce(self, position: Point2D): # Wcześniej: rozmnoz
-        new_organism = self.clone(position) # Wcześniej: sklonuj
-        self.world.add_organism(new_organism)
+    def reproduce(self, position: Point2D, world: 'World'):
+        new_organism = self.clone(position)
+        world.add_organism(new_organism)

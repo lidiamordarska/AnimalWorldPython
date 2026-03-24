@@ -4,8 +4,8 @@ from animal import Animal
 
 class Wolf(Animal):
 
-    def __init__(self, position: Point2D, world):
-        super().__init__('W', 9, 5, position, world)
+    def __init__(self, position: Point2D):
+        super().__init__('W', 9, 5, position, False)
 
     def clone(self, location: Point2D):
-        return Wolf(location, self.world)
+        return Wolf(location)
