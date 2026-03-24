@@ -16,4 +16,4 @@ class Point2D:
         if isinstance(other, Point2D):
             return Point2D(self.x + other.x, self.y + other.y)
         else:
-            raise TypeError("Operacja dodawania wymaga obiektu typu Point2D")
+            raise TypeError("Addition operation requires a Point2D object")
